@@ -135,14 +135,16 @@ stateContractAddress=_stateContractAddress;
             require(msg.sender==waitingtransfers[tokenId]);
         address from=prev_owners[tokenId][prev_owners[tokenId].length-1].add;
         address to = msg.sender;
+                // _transfer function of the ERC721.sol library is executed
                 _transfer(from, to, tokenId);
             //    require(_checkOnERC721Received(from, to, tokenId, _data), "ERC721: transfer to non ERC721Receiver implementer");
 
+                // The address of the new owner is stored in thşs mapping with its verification status. The new owner stored as an Owner object.
                     prev_owners[tokenId].push(Owner(
                 to,
                 callQueryVerified(stateContractAddress, to)
              ));
-
+           // The address is delted from the waiting transfers mapping because the transfer has been executed successfully.
            delete waitingtransfers[tokenId];
 
         }
