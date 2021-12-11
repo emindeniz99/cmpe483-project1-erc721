@@ -104,10 +104,15 @@ stateContractAddress=_stateContractAddress;
         emit Success(success,isVerified);
        return  isVerified;
     }  
-
-    // User will do transfer using safeTransferFrom public function and this function will be envoked 
-    // emin , gönderici
-    // gözdeye alım izni verir
+    
+    
+    // to: the address to send the tokenId and the address which is the prospective new owner of the token
+    // tokenId: token id of the unique product
+    // User can do tokenId transfer by calling this function. If the token is not waiting any user to be accepted by its ownership
+    // and if the caller of this function is the last owner of this token then this token is saved in the waitingtransfers mapping.
+    // In this mapping, the key is the tokenId in question and the value is the address that is wanted to send. The ownership of the token 
+    // does not change until the new address accepts this transfer so until that, the tokenId is saved in the waitingtransfers mapping in order 
+    // to prevent token to be sent to others.
     function transfer(
         address to,
         uint256 tokenId
@@ -121,9 +126,11 @@ stateContractAddress=_stateContractAddress;
         
 
     }
-
-        // should be called by next owner
-        // gözde, alıcı
+        // tokenId: the id of the token whose ownership will be changed via this function
+        // The address of the user who is requested to be the new owner of a token calls this function to approve the transfer and take its ownership.
+        // If the caller of this function is the address waited for the transfer, _transfer function of ERC721.sol library is executed. The new owner is 
+        // pushed into the prevOwner mapping which stores the address of the users and the boolean variable which states them whether they are verified or not.
+        // The new owner and token tuple is deleted from the waitingtransfer mapping. 
         function approveTransfer(uint256 tokenId) public {
             require(msg.sender==waitingtransfers[tokenId]);
         address from=prev_owners[tokenId][prev_owners[tokenId].length-1].add;
