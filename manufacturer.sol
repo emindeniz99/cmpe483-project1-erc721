@@ -4,45 +4,67 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
+/** Product Provenance Contract
+ */
 contract MyProducttContract is ERC721 {
+    // Counter is used for tokenID increment
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-    address manufacturer;
-    address stateContractAddress; //local vm
 
+    // manufacturer address so it is deployer of the contract
+    // it is only allowed address for minting
+    address manufacturer;
+
+    // when deploying the contract,
+    // state contract address is necessary for checking verified status
+    address stateContractAddress;
+
+    // modifier allows only owner of the contract
+    // TODO: owner or manufacturer ?
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
+    // constructor takes the state address
     constructor(address _stateContractAddress) ERC721("GameItem", "ITM") {
+        // deployer is manufacturer and owner of the contractor
         manufacturer = msg.sender;
         stateContractAddress = _stateContractAddress;
     }
 
+    // record of transaction(new ownership)
     struct Owner {
         address add;
         bool isVerified;
     }
 
+    // Event type for logging
     event Success(bool success, bool isVerified);
     event Log(string log);
 
+    // array of all (current and previous) owners
+    // last element of it shows to current owner
     mapping(uint256 => Owner[]) private prev_owners;
 
     // hash of serial number and zipcode
     mapping(uint256 => uint256) private hashes;
 
+    // when a owner transfer tokenIDX to addressY, the transfer will wait at the this address
+    // tokenIDX: addressY // it means waiting transfer
+    // when the next owner approve the transfer,
+    //it will be removed from waiting transfers and the new record will be added to prev_owners
+    // tokenIDX: 0 // it means no waiting transfer for this token
     mapping(uint256 => address) public waitingtransfers;
 
-    //TODO:
+    // validate the uniqueness of serial number
+    // 0 means not minted token, we use 1 for startindex of tokenIDs
     mapping(string => uint256) public serialNumbers; // serialnumber -> tokenid
 
-    // ??? 0 means not minted token, we use 1 for startindex
-
-    /**
-    mapping(address => bool ) manufacturers;
-
-    function registerFabrika(address fabrika) public {
-        manufacturers[fabrika]=true;
-    }
-*/
     function mint(string memory serial_number, string memory zipcode) public {
+        // TODO: replace with modifier
+        require(msg.sender == manufacturer);
+
         emit Log("gas price:");
 
         emit Log(string(Strings.toString(tx.gasprice)));
@@ -74,10 +96,6 @@ contract MyProducttContract is ERC721 {
         emit Log(string(Strings.toString(hashes[newItemId])));
         emit Log(string(Strings.toString(newItemId)));
 
-        // require(manufacturers[msg.sender]==true);
-        require(msg.sender == manufacturer);
-        emit Log("aa5");
-
         prev_owners[newItemId].push(
             Owner(
                 msg.sender,
@@ -92,7 +110,7 @@ contract MyProducttContract is ERC721 {
 
     //view olacak mı???
     function callQueryVerified(address contractaddr, address newOwner)
-        public
+        internal
         returns (bool)
     {
         //_addr.call{value: msg.value, gas: 5000}(
