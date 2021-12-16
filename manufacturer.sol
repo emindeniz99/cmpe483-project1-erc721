@@ -145,6 +145,22 @@ contract MyProducttContract is ERC721 {
         waitingtransfers[tokenId] = to;
     }
 
+    function recallTransfer(uint256 tokenId) public virtual {
+        // TODO? virtual ??
+
+        // check whether waiting transfer for this token exists or not
+        require(waitingtransfers[tokenId] != address(0));
+
+        // check ownership
+        require(
+            prev_owners[tokenId][prev_owners[tokenId].length - 1].add ==
+                msg.sender
+        );
+
+        // cancel waiting transfer
+        waitingtransfers[tokenId] = 0;
+    }
+
     // tokenId: the id of the token whose ownership will be changed via this function
     // The address of the user who is requested to be the new owner of a token calls this function to approve the transfer and take its ownership.
     // If the caller of this function is the address waited for the transfer, _transfer function of ERC721.sol library is executed. The new owner is
