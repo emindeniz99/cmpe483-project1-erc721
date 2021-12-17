@@ -175,7 +175,7 @@ contract MyProducttContract is ERC721 {
         );
 
         // cancel waiting transfer
-        waitingtransfers[tokenId] = 0;
+        waitingtransfers[tokenId] = address(0);
     }
 
     // tokenId: the id of the token whose ownership will be changed via this function
