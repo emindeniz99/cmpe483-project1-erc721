@@ -58,9 +58,12 @@ contract MyProducttContract is ERC721 {
     mapping(uint256 => address) public waitingtransfers;
 
     // validate the uniqueness of serial number
+    // map of serial number and tokenID
     // 0 means not minted token, we use 1 for startindex of tokenIDs
     mapping(string => uint256) public serialNumbers; // serialnumber -> tokenid
 
+    // serial_number: unique number for product
+    // zipcode: zipcode of manufacturer
     function mint(string memory serial_number, string memory zipcode) public {
         // TODO: replace with modifier
         require(msg.sender == manufacturer);
@@ -72,8 +75,10 @@ contract MyProducttContract is ERC721 {
 
         emit Log(string(Strings.toString(gasleft())));
 
+        // check the uniqueness of serial number
         require(serialNumbers[serial_number] == 0); // indicator for unminted token for the serial no
 
+        // increase counter for next available token ID
         _tokenIds.increment();
 
         emit Log(zipcode);
@@ -81,24 +86,32 @@ contract MyProducttContract is ERC721 {
 
         emit Log("aa1");
 
+        // new Token ID
         uint256 newItemId = _tokenIds.current();
-        serialNumbers[serial_number] = newItemId; // serial no
+
+        // serial number - tokenID map
+        serialNumbers[serial_number] = newItemId;
 
         emit Log("aa2");
 
+        // new Token ID minting process that provided by ERC721Contract to sender adress
         _mint(msg.sender, newItemId);
         emit Log("aa3");
 
+        // hash of serial number and zipcode
         hashes[newItemId] = uint256(
             keccak256(abi.encodePacked(serial_number, zipcode))
         );
+
         emit Log("aa4");
         emit Log(string(Strings.toString(hashes[newItemId])));
         emit Log(string(Strings.toString(newItemId)));
 
+        // write new(minter) owner to owners history array
         prev_owners[newItemId].push(
             Owner(
                 msg.sender,
+                // check current verification status of minter
                 callQueryVerified(stateContractAddress, msg.sender)
             )
         );
@@ -109,6 +122,10 @@ contract MyProducttContract is ERC721 {
     }
 
     //view olacak mı???
+    // calls queryVerify function of state
+    // helper function
+    // contractaddr: state contract address
+    // newOwner: the address that will be queried for verified status
     function callQueryVerified(address contractaddr, address newOwner)
         internal
         returns (bool)
@@ -175,7 +192,7 @@ contract MyProducttContract is ERC721 {
         _transfer(from, to, tokenId);
         //    require(_checkOnERC721Received(from, to, tokenId, _data), "ERC721: transfer to non ERC721Receiver implementer");
 
-        // The address of the new owner is stored in thşs mapping with its verification status. The new owner stored as an Owner object.
+        // The address of the new owner is stored in this mapping with its verification status. The new owner stored as an Owner object.
         prev_owners[tokenId].push(
             Owner(to, callQueryVerified(stateContractAddress, to))
         );
@@ -183,9 +200,13 @@ contract MyProducttContract is ERC721 {
         delete waitingtransfers[tokenId];
     }
 
+    // get owner history of a token
+    // tokenId: which token is traced
+    // view function
     function trace(uint256 tokenId) public view returns (Owner[] memory) {
         //   emit Log(string(Strings.toString(prev_owners[tokenId])));
 
+        // create a fixed size temporary array
         Owner[] memory temp = new Owner[](prev_owners[tokenId].length);
         for (uint256 i = 0; i < prev_owners[tokenId].length; i++) {
             temp[i] = (prev_owners[tokenId][i]);
