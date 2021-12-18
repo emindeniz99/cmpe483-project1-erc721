@@ -1,4 +1,4 @@
-const state = artifacts.require("state");
+const state = artifacts.require("StateContract");
 const product = artifacts.require("ProductContract");
 //Revert Assertions
 const assert = require("chai").assert;
@@ -12,6 +12,7 @@ contract("state", () => {
 
     assert(stateDep.address !== "");
   });
+
   //checks whether verify and queryVerified function works properly
   //First we will assert that accounts[1] is unverified
   //Then we will apply verify(accounts[1])
@@ -26,6 +27,7 @@ contract("state", () => {
     var afterVerify = await stateDep.queryVerified(accounts[1]);
     assert(afterVerify === true);
   });
+
   //Here I try to verify accounts[2] by using accounts[1] instead of state address
   //I assert an error, since only state can verify the users
   it("Another address other than state should NOT verify an address", async () => {
@@ -44,11 +46,13 @@ contract("product", () => {
     const productDep = await product.deployed();
     assert(productDep.address !== "");
   });
+
   //Checks Whether Manufacturer can mint a token
   //checking conditions:
   //number of tokens shsould increment by 1
   //hash value of the produced token should be created
   //we assert both of them
+
   it("Should mint the token properly", async () => {
     const productDep = await product.deployed(); //deploy satırı
     //var accounts = await web3.eth.getAccounts();
@@ -63,6 +67,7 @@ contract("product", () => {
     assert(hashValue !== 0); //hash value is created for this tokenId
     assert(1 === afterCounter.toNumber() - beforeCounter.toNumber()); //token counter is incremented by 1
   });
+
   //Above Manufacturer has created a token with serial = "serial"
   //Now, I am again trying to mint a token with same serial
   //I got the error as expected
@@ -78,6 +83,7 @@ contract("product", () => {
       "Token should be already unminted"
     );
   });
+
   //It is tried to mint a token using accounts[1], different from manufacturer
   //It gives error
   //truffleAssert.reverts catches the error and passes the test
@@ -89,13 +95,13 @@ contract("product", () => {
       "Only manufacturer can mint token"
     );
   });
+
   //Checks a manufacturer can transfer token properly
   //I transfer token 1 from manufacturer (deployer of this contract)
   //to accounts[1]
   //this functions should assign accounts[1] to waitingtransfers[1]
   //I checked whether it holds or not by asserting
   //assert(accounts[1] === waitingTransfers[1])
-
   it("Should transfer token properly", async () => {
     const productDep = await product.deployed();
     var manufacturerAddress = await productDep.manufacturer.call();
@@ -107,6 +113,7 @@ contract("product", () => {
     var expected = await productDep.waitingtransfers.call(1);
     assert(accounts[1] === expected);
   });
+
   it("Should NOT transfer waiting token", async () => {
     const productDep = await product.deployed();
     var manufacturerAddress = await productDep.manufacturer.call();
@@ -119,6 +126,7 @@ contract("product", () => {
       "Waiting token can not be transferred"
     );
   });
+
   //Check Approve function works properly
   //In above function Miner have sent token 1 to accounts[1]
   //now accounts[1] will be able to approve it
@@ -134,6 +142,7 @@ contract("product", () => {
     });
     assert(accounts[1] === lastOwner);
   });
+
   //Here, Manufacturer mint another token with id = 2
   //since it belongs to manufacturer, accounts[1] will not be able to transer it to another
   //Here we try to transfer it from accounts[1] and get error
@@ -147,9 +156,10 @@ contract("product", () => {
     });
     await truffleAssert.reverts(
       productDep.transfer(accounts[2], 2, { from: accounts[1], gas: 3000000 }),
-      "Transferred token should belong to you"
+      "You should be the last owner of the token."
     );
   });
+
   //Checks Traceback function works properly or not
   //In above test, Manufacturer has sent the token 1 to accounts[1]
   //Now accounts[1] will send to accounts[2] and accounts[2] will be able to traceback
@@ -219,7 +229,7 @@ contract("product", () => {
 
     await truffleAssert.reverts(
       productDep.cancelTransfer(3, { from: manufacturerAddress, gas: 3000000 }),
-      "Token should be in waiting list"
+      "You should be the last owner of the token"
     );
   });
   //Now accounts[3] has token 3
@@ -239,37 +249,3 @@ contract("product", () => {
     );
   });
 });
-
-// const AdvancedStorage = artifacts.require("AdvancedStorage");
-
-// contract('AdvancedStorage',()=>{
-//     it('Should add the element into array', async () => {
-//         const advancedStorage = await AdvancedStorage.deployed();
-//         await advancedStorage.add(10);
-//         const result = await advancedStorage.get(0);
-//         assert(result.toNumber()===10);
-
-//     });
-
-//     it('Should get the element from array', async () => {
-//         const advancedStorage = await AdvancedStorage.deployed();
-//         await advancedStorage.add(20);
-//         const value = await advancedStorage.get(1);
-//         assert(value.toNumber() === 20)
-
-//     });
-
-//     it('Should get the array itself', async () => {
-//         const advancedStorage = await AdvancedStorage.deployed();
-//         const rawIds = await advancedStorage.getAll();
-//         const ids = rawIds.map(id => id.toNumber());
-//         assert.deepEqual(ids,[10,20]);
-
-//     });
-//     it('Should get the length of the array', async () => {
-//         const advancedStorage = await AdvancedStorage.deployed();
-//         const value = await advancedStorage.length();
-//         assert(value.toNumber() === 2)
-
-//     });
-// });

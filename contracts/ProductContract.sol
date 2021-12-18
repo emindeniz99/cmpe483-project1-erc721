@@ -208,7 +208,7 @@ contract ProductContract is ERC721 {
     function approveTransfer(uint256 tokenId) public {
         require(
             msg.sender == waitingtransfers[tokenId],
-            "Token should be sent to you to approve the transfer"
+            "Token should be in waiting list"
         );
         address from = prev_owners[tokenId][prev_owners[tokenId].length - 1]
             .add;

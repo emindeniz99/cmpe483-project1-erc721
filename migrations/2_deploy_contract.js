@@ -1,4 +1,4 @@
-var state = artifacts.require("state");
+var state = artifacts.require("StateContract");
 var ProductContract = artifacts.require("ProductContract");
 
 module.exports = function (deployer) {

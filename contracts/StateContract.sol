@@ -2,7 +2,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract MyContract is ERC721 {
+contract StateContract is ERC721 {
     // Stores the address of the owner of the contract
     address state;
     // Stores verified addresses in a mapping. If it is verified then it has a value True in this mapping
@@ -17,7 +17,7 @@ contract MyContract is ERC721 {
     // When this function is called by the owner of this contract, the manufacturer or the customer address is verified and stored in the -verified- mapping
     // with the value True
     function verify(address a) external {
-        require(msg.sender == state);
+        require(msg.sender == state, "Only state can verify the users");
         verified[a] = true;
     }
 
