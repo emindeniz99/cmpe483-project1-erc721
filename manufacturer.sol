@@ -21,9 +21,19 @@ contract ProductContract is ERC721 {
     address public stateContractAddress;
 
     // modifier allows only owner of the contract
-    // TODO: owner or manufacturer ?
-    modifier onlyOwner() {
-        require(msg.sender == owner);
+    modifier onlyContractOwner() {
+        require(msg.sender == manufacturer, "Only manufacturer can mint token");
+        _;
+    }
+
+    // modifier allows only owner of the token that is given as parameter
+    modifier onlyTokenOwner(uint256 tokenId) {
+        // check ownership
+        require(
+            prev_owners[tokenId][prev_owners[tokenId].length - 1].add ==
+                msg.sender,
+            "You should be the last owner of the token"
+        );
         _;
     }
 
@@ -70,10 +80,10 @@ contract ProductContract is ERC721 {
 
     // serial_number: unique number for product
     // zipcode: zipcode of manufacturer
-    function mint(string memory serial_number, string memory zipcode) public {
-        // TODO: replace with modifier
-        require(msg.sender == manufacturer, "Only manufacturer can mint token");
-
+    function mint(string memory serial_number, string memory zipcode)
+        public
+        onlyContractOwner
+    {
         emit Log("gas price:");
 
         emit Log(string(Strings.toString(tx.gasprice)));
@@ -158,7 +168,11 @@ contract ProductContract is ERC721 {
     // In this mapping, the key is the tokenId in question and the value is the address that is wanted to send. The ownership of the token
     // does not change until the new address accepts this transfer so until that, the tokenId is saved in the waitingtransfers mapping in order
     // to prevent token to be sent to others.
-    function transfer(address to, uint256 tokenId) public virtual {
+    function transfer(address to, uint256 tokenId)
+        public
+        virtual
+        onlyTokenOwner(tokenId)
+    {
         // TODO? virtual ne??
 
         require(
@@ -166,29 +180,20 @@ contract ProductContract is ERC721 {
             "Waiting token can not be transferred"
         );
 
-        require(
-            prev_owners[tokenId][prev_owners[tokenId].length - 1].add ==
-                msg.sender,
-            "Transferred token should belong to you"
-        );
-
         waitingtransfers[tokenId] = to;
     }
 
-    function cancelTransfer(uint256 tokenId) public virtual {
+    function cancelTransfer(uint256 tokenId)
+        public
+        virtual
+        onlyTokenOwner(tokenId)
+    {
         // TODO? virtual ??
 
         // check whether waiting transfer for this token exists or not
         require(
             waitingtransfers[tokenId] != address(0),
             "Token should be in waiting list"
-        );
-
-        // check ownership
-        require(
-            prev_owners[tokenId][prev_owners[tokenId].length - 1].add ==
-                msg.sender,
-            "You should be the last owner of the token"
         );
 
         // cancel waiting transfer
