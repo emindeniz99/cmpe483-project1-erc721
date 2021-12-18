@@ -1,5 +1,5 @@
 const state = artifacts.require("state");
-const product = artifacts.require("product");
+const product = artifacts.require("ProducttContract");
 //Revert Assertions
 const assert = require("chai").assert;
 const truffleAssert = require('truffle-assertions');
