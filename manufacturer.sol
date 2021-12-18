@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
@@ -6,18 +7,18 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 /** Product Provenance Contract
  */
-contract MyProducttContract is ERC721 {
+contract ProducttContract is ERC721 {
     // Counter is used for tokenID increment
     using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
+    Counters.Counter public _tokenIds;
 
     // manufacturer address so it is deployer of the contract
     // it is only allowed address for minting
-    address manufacturer;
+    address public manufacturer;
 
     // when deploying the contract,
     // state contract address is necessary for checking verified status
-    address stateContractAddress;
+    address public stateContractAddress;
 
     // modifier allows only owner of the contract
     // TODO: owner or manufacturer ?
@@ -45,10 +46,10 @@ contract MyProducttContract is ERC721 {
 
     // array of all (current and previous) owners
     // last element of it shows to current owner
-    mapping(uint256 => Owner[]) private prev_owners;
+    mapping(uint256 => Owner[]) public prev_owners;
 
     // hash of serial number and zipcode
-    mapping(uint256 => uint256) private hashes;
+    mapping(uint256 => uint256) public hashes;
 
     // when a owner transfer tokenIDX to addressY, the transfer will wait at the this address
     // tokenIDX: addressY // it means waiting transfer
@@ -61,12 +62,16 @@ contract MyProducttContract is ERC721 {
     // map of serial number and tokenID
     // 0 means not minted token, we use 1 for startindex of tokenIDs
     mapping(string => uint256) public serialNumbers; // serialnumber -> tokenid
-
+    
+        function getLastOwner(uint key) public view returns (address){
+        address fromAdd=prev_owners[key][prev_owners[key].length-1].add;
+        return fromAdd;
+    }
     // serial_number: unique number for product
     // zipcode: zipcode of manufacturer
     function mint(string memory serial_number, string memory zipcode) public {
         // TODO: replace with modifier
-        require(msg.sender == manufacturer);
+        require(msg.sender == manufacturer,"Only manufacturer can mint token");
 
         emit Log("gas price:");
 
@@ -76,7 +81,7 @@ contract MyProducttContract is ERC721 {
         emit Log(string(Strings.toString(gasleft())));
 
         // check the uniqueness of serial number
-        require(serialNumbers[serial_number] == 0); // indicator for unminted token for the serial no
+        require(serialNumbers[serial_number] == 0,"Token should be already unminted"); // indicator for unminted token for the serial no
 
         // increase counter for next available token ID
         _tokenIds.increment();
@@ -152,26 +157,28 @@ contract MyProducttContract is ERC721 {
     function transfer(address to, uint256 tokenId) public virtual {
         // TODO? virtual ne??
 
-        require(waitingtransfers[tokenId] == address(0));
+        require(waitingtransfers[tokenId] == address(0),"Waiting token can not be transferred");
 
         require(
             prev_owners[tokenId][prev_owners[tokenId].length - 1].add ==
-                msg.sender
+                msg.sender,
+                "Transferred token should belong to you"
         );
 
         waitingtransfers[tokenId] = to;
     }
 
-    function recallTransfer(uint256 tokenId) public virtual {
+    function cancelTransfer(uint256 tokenId) public virtual {
         // TODO? virtual ??
 
         // check whether waiting transfer for this token exists or not
-        require(waitingtransfers[tokenId] != address(0));
+        require(waitingtransfers[tokenId] != address(0),"Token should be in waiting list");
 
         // check ownership
         require(
             prev_owners[tokenId][prev_owners[tokenId].length - 1].add ==
-                msg.sender
+                msg.sender,
+                "You should be the last owner of the token"
         );
 
         // cancel waiting transfer
@@ -184,7 +191,7 @@ contract MyProducttContract is ERC721 {
     // pushed into the prevOwner mapping which stores the address of the users and the boolean variable which states them whether they are verified or not.
     // The new owner and token tuple is deleted from the waitingtransfer mapping.
     function approveTransfer(uint256 tokenId) public {
-        require(msg.sender == waitingtransfers[tokenId]);
+        require(msg.sender == waitingtransfers[tokenId],"Token should be sent to you to approve the transfer");
         address from = prev_owners[tokenId][prev_owners[tokenId].length - 1]
             .add;
         address to = msg.sender;
