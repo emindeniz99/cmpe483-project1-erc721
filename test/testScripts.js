@@ -113,7 +113,9 @@ contract("product", () => {
     var expected = await productDep.waitingtransfers.call(1);
     assert(accounts[1] === expected);
   });
-
+  //We have transferred token 1 above. Now it is in waitinglist
+  //Therefore, when we try to transfer it we have to get an error
+  //truffleAssert handles the error and passes the test
   it("Should NOT transfer waiting token", async () => {
     const productDep = await product.deployed();
     var manufacturerAddress = await productDep.manufacturer.call();
