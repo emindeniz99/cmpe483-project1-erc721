@@ -146,10 +146,7 @@ contract ProductContract is ERC721 {
     // In this mapping, the key is the tokenId in question and the value is the address that is wanted to send. The ownership of the token
     // does not change until the new address accepts this transfer so until that, the tokenId is saved in the waitingtransfers mapping in order
     // to prevent token to be sent to others.
-    function transfer(address to, uint256 tokenId)
-        public
-        virtual
-    {
+    function transfer(address to, uint256 tokenId) public virtual {
         require(
             waitingtransfers[tokenId] == address(0),
             "Waiting token can not be transferred"
@@ -164,10 +161,7 @@ contract ProductContract is ERC721 {
     }
 
     // the sender can cancel the transfer by removing the token from waitingtransfers mapping
-    function cancelTransfer(uint256 tokenId)
-        public
-        virtual
-    {
+    function cancelTransfer(uint256 tokenId) public virtual {
         // check whether waiting transfer for this token exists or not
         require(
             waitingtransfers[tokenId] != address(0),
@@ -175,7 +169,8 @@ contract ProductContract is ERC721 {
         );
         require(
             prev_owners[tokenId][prev_owners[tokenId].length - 1].add ==
-                msg.sender,"You should be the last owner of the token"
+                msg.sender,
+            "You should be the last owner of the token"
         );
 
         // cancel waiting transfer
