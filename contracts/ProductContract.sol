@@ -149,11 +149,15 @@ contract ProductContract is ERC721 {
     function transfer(address to, uint256 tokenId)
         public
         virtual
-        onlyTokenOwner(tokenId)
     {
         require(
             waitingtransfers[tokenId] == address(0),
             "Waiting token can not be transferred"
+        );
+        require(
+            prev_owners[tokenId][prev_owners[tokenId].length - 1].add ==
+                msg.sender,
+            "Transferred token should belong to you"
         );
 
         waitingtransfers[tokenId] = to;
