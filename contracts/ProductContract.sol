@@ -163,12 +163,15 @@ contract ProductContract is ERC721 {
     function cancelTransfer(uint256 tokenId)
         public
         virtual
-        onlyTokenOwner(tokenId)
     {
         // check whether waiting transfer for this token exists or not
         require(
             waitingtransfers[tokenId] != address(0),
             "Token should be in waiting list"
+        );
+        require(
+            prev_owners[tokenId][prev_owners[tokenId].length - 1].add ==
+                msg.sender,"You should be the last owner of the token"
         );
 
         // cancel waiting transfer
