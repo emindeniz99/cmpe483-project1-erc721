@@ -4,3 +4,7 @@
 
 ## Docs
 Please look at the pdf file
+
+## Testing
+* `yarn` to install dependencies(package.json)
+* `yarn truffle test` to start test
