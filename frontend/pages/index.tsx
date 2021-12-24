@@ -2,17 +2,25 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useWeb3 } from "../components/Web3js";
+import { compiledStateContract, useWeb3 } from "../components/Web3js";
 import styles from "../styles/Home.module.css";
-import State from "../../truffle/build/contracts/StateContract.json";
+
 const Home: NextPage = () => {
-  const { web3, selectedAccountAddress } = useWeb3();
+  const { web3, selectedAccountAddress, stateContract } = useWeb3();
   const [networkId, setnetworkId] = useState<number | undefined>(undefined);
+
+  const [balance, setBalance] = useState<number | undefined>(undefined);
+
+  console.log(stateContract);
+
   useEffect(() => {
     (async () => {
-      setnetworkId(await web3?.eth.net.getId());
+      setnetworkId(await web3.eth.net.getId());
+
+      const mybalance = await web3.eth.getBalance(selectedAccountAddress);
+      setBalance(Number(mybalance));
     })();
-  }, [web3]);
+  }, [web3, selectedAccountAddress]);
   return (
     <div className={styles.container}>
       <Head>
@@ -23,6 +31,7 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         <div>networkId: {networkId}</div>
+        <div>balance: {balance}</div>
       </main>
 
       <footer className={styles.footer}></footer>
