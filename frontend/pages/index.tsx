@@ -6,12 +6,10 @@ import { useWeb3 } from "../components/Web3js";
 import styles from "../styles/Home.module.css";
 import State from "../../truffle/build/contracts/StateContract.json";
 const Home: NextPage = () => {
-  const { web3 } = useWeb3();
-  const [accounts, setaccounts] = useState<string[] | undefined>(undefined);
+  const { web3, selectedAccountAddress } = useWeb3();
   const [networkId, setnetworkId] = useState<number | undefined>(undefined);
   useEffect(() => {
     (async () => {
-      setaccounts(await web3?.eth.getAccounts());
       setnetworkId(await web3?.eth.net.getId());
     })();
   }, [web3]);
@@ -24,12 +22,7 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        <div>
-          {accounts?.map((acc) => {
-            return <div key={acc}>{acc}</div>;
-          })}
-        </div>
-        <div> {networkId}</div>
+        <div>networkId: {networkId}</div>
       </main>
 
       <footer className={styles.footer}></footer>
