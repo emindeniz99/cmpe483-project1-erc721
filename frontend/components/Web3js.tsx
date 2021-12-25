@@ -36,13 +36,20 @@ const Web3js: React.FC<Props> = (props) => {
   >(undefined);
 
   useEffect(() => {
+    (window as any).selectedAccountAddress = selectedAccountAddress;
+  }, [selectedAccountAddress]);
+
+  useEffect(() => {
     if (web3) {
-      setstateContract(
-        new web3.eth.Contract(compiledStateContract.abi as AbiItem[])
+      (window as any).stateContract = new web3.eth.Contract(
+        compiledStateContract.abi as AbiItem[]
       );
-      setproductContract(
-        new web3.eth.Contract(compiledProductContract.abi as AbiItem[])
+      setstateContract((window as any).stateContract);
+
+      (window as any).productContract = new web3.eth.Contract(
+        compiledProductContract.abi as AbiItem[]
       );
+      setproductContract((window as any).productContract);
     }
   }, [web3]);
 
