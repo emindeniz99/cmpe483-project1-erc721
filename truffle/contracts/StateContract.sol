@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 contract StateContract is ERC721 {
     // Stores the address of the owner of the contract
-    address state;
+    address public state;
 
     // Stores verified addresses in a mapping. If it is verified then it has a value True in this mapping
     mapping(address => bool) verified;
