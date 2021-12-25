@@ -83,7 +83,10 @@ const Home: NextPage = () => {
           />
           <button
             onClick={async () => {
-              if (contractOwner === selectedAccountAddress) {
+              if (
+                contractOwner.toLowerCase() ===
+                selectedAccountAddress.toLowerCase()
+              ) {
                 const result = await stateContract.methods
                   .verify(verifiedAddress)
                   .send({ from: selectedAccountAddress });
