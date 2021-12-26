@@ -15,10 +15,15 @@ const Home: NextPage = () => {
 
   const [contractOwner, setcontractOwner] = useState("");
   const [contractAddress, setcontractAddress] = useState(_contractAddress);
-  const [queryVerifiedAddress, setqueryVerifiedAddress] = useState("");
-  const [verifiedAddress, setverifiedAddress] = useState("");
-  const [verifiedResult, setverifiedResult] = useState("");
-
+  const [tokenIdTrace, setTokenIdTrace] = useState("");
+  const [to, setToAdress] = useState("");
+  const [tokenIdTransfer, setTokenIdTransfer] = useState("");
+  const [tokenTransfer, setTokenTransfer] = useState("");
+  const [tokenTrace, setTokenTrace] = useState("");
+  const [tokenIdApproveTransfer, setTokenIdApproveTransfer] = useState("");
+  const [approveTransfer, setApproveTransfer] = useState("");
+  const [tokenIdCancelTransfer, setTokenIdCancelTransfer] = useState("");
+  const [resultCancelTransfer, setCancelTransfer] = useState("");
   useEffect(() => {
     (async () => {
       if (_contractAddress) {
@@ -54,48 +59,126 @@ const Home: NextPage = () => {
           </div>
         )}
         <div>
-          (TODO CHANGE) queryVerified:{" "}
+          trace a token (type tokenId):{" "}
           <input
             type="text"
-            value={queryVerifiedAddress}
-            onChange={(e) => setqueryVerifiedAddress(e.target.value)}
+            value={tokenIdTrace}
+            onChange={(e) => setTokenIdTrace(e.target.value)}
           />
           <button
             onClick={async () => {
-              alert(
-                await productContract.methods
-                  .queryVerified(queryVerifiedAddress)
+                const resultTrace=await productContract.methods
+                  .trace(tokenIdTrace)
                   .call({ from: selectedAccountAddress })
-              );
-            }}
+                setTokenTrace(resultTrace);
+            }
+        }
           >
             call
           </button>
+          <pre>{JSON.stringify(tokenTrace, null, 2)}</pre>
         </div>
 
         <div>
-          (TODO CHANGE) verify:{" "}
+          transfer to:{" "}
           <input
             type="text"
-            value={verifiedAddress}
-            onChange={(e) => setverifiedAddress(e.target.value)}
+            value={to}
+            onChange={(e) => setToAdress(e.target.value)}
+          />
+          tokenId:{" "}
+          <input
+            type="text"
+            value={tokenIdTransfer}
+            onChange={(e) => setTokenIdTransfer(e.target.value)}
           />
           <button
             onClick={async () => {
-              if (contractOwner === selectedAccountAddress) {
-                const result = await productContract.methods
-                  .verify("0xa...")
+              const r=await productContract.methods.returnWaitingAddress(tokenIdTransfer).call({from:selectedAccountAddress});
+              if (r==0
+              // there is no waiting user for this token
+                ) {
+                  const prevOwnersOfToken=await productContract.methods.returnPrevOwnerAddressOfToken(tokenIdTransfer).call({from:selectedAccountAddress});
+                  if(prevOwnersOfToken==selectedAccountAddress
+                    // the last owner of this token is this person who is calling
+                  ){
+                    const resultTransfer = await productContract.methods
+                  .transfer(to,tokenIdTransfer)
                   .send({ from: selectedAccountAddress });
-                setverifiedResult(result);
+                setTokenTransfer(resultTransfer);
+                alert(resultTransfer);
+                  }else{
+                    alert("You are not the owner of this token so you can't send this token to someone else")
+                  }
+                
               } else {
-                alert("you are not the owner of the state contract");
+                
+                alert("This token is waiting another user to approve its transfer you can't send this token to someone else");
               }
             }}
           >
             call
           </button>
-          <pre>{JSON.stringify(verifiedResult, null, 2)}</pre>
+          <pre>{JSON.stringify(tokenTransfer, null, 2)}</pre>
         </div>
+
+        <div>
+          Approve transfer (type tokenId): {" "}
+          <input type="text"
+            value={tokenIdApproveTransfer}
+            onChange={(e) => setTokenIdApproveTransfer(e.target.value)}
+            />
+          <button
+          onClick={async () => {
+            const a= await productContract.methods.returnWaitingAddress(tokenIdApproveTransfer).call({ from: selectedAccountAddress });
+            if(a==selectedAccountAddress){
+              const resultApproveTransfer=await productContract.methods.approveTransfer(tokenIdApproveTransfer).send({ from: selectedAccountAddress });
+              setApproveTransfer(resultApproveTransfer);
+              alert(approveTransfer);
+            }else{
+              alert("You are not the address where this token waits to be approved");
+            }
+          }}
+          >
+          
+    
+          call
+          </button>
+          <pre>{JSON.stringify(approveTransfer, null, 2)}</pre>
+        </div>
+        
+        <div>
+          Cancel transfer (type tokenId): {" "}
+          <input type="text"
+            value={tokenIdCancelTransfer}
+            onChange={(e) => setTokenIdCancelTransfer(e.target.value)}
+            />
+          <button
+          onClick={async () => {
+            const b =await productContract.methods.returnWaitingAddress(tokenIdCancelTransfer).call({from:selectedAccountAddress});
+            if(b!=0){
+              const prevOwnersOfToken=await productContract.methods.returnPrevOwnerAddressOfToken(tokenIdCancelTransfer).call({from:selectedAccountAddress});
+                  
+              if(prevOwnersOfToken==selectedAccountAddress){
+                const resultCancel=await productContract.methods.canvcelTransfer(tokenIdCancelTransfer).send({ from: selectedAccountAddress });
+              setCancelTransfer(resultCancel);
+              alert(approveTransfer);
+              }else{
+                alert("You are not the owner of this token so you can't cancel the transfer");
+              }
+              
+            }else{
+              alert("This token has not been sent to an address for transfer previously so there is nothing to cancel");
+            }
+          }}
+          >
+          
+    
+          call
+          </button>
+          <pre>{JSON.stringify(resultCancelTransfer, null, 2)}</pre>
+        </div>
+
       </main>
 
       <footer className={styles.footer}></footer>

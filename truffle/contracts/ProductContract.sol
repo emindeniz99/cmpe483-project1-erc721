@@ -213,4 +213,12 @@ contract ProductContract is ERC721 {
 
         return temp;
     }
+
+    function returnPrevOwnerAddressOfToken(uint256 tokenId) public view returns (address){
+        return prev_owners[tokenId][prev_owners[tokenId].length - 1].add;
+    }
+
+    function returnWaitingAddress(uint256 tokenId) public view returns (address){
+        return  waitingtransfers[tokenId];
+    }
 }
