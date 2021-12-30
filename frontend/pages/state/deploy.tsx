@@ -60,11 +60,38 @@ const Home: NextPage = () => {
             setaddress(aaaa.options.address);
           }}
         >
-          deploy
+          deploy a new contract
         </button>
+        <br />
+        <h3>or</h3>
+        <GoToContract />
       </main>
 
       <footer className={styles.footer}></footer>
+    </div>
+  );
+};
+
+const GoToContract = () => {
+  const [contractAddress, setContractAddress] = useState("");
+  const router = useRouter();
+
+  return (
+    <div>
+      go to deployed contract:{" "}
+      <input
+        type="text"
+        value={contractAddress}
+        onChange={(e) => setContractAddress(e.target.value)}
+        placeholder="contract address"
+      />
+      <button
+        onClick={async () => {
+          router.push(`/state/${contractAddress}`);
+        }}
+      >
+        go
+      </button>
     </div>
   );
 };

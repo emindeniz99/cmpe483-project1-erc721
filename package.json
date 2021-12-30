@@ -1,0 +1,25 @@
+{
+  "name": "cmpe483-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/emindeniz99/cmpe483-project1-erc721",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  },
+  "workspaces": {
+    "packages": [
+      "frontend",
+      "truffle"
+    ],
+    "nohoist": [
+      "**"
+    ]
+  },
+  "scripts": {
+    "contracts:compile": "lerna exec --scope contracts -- yarn truffle compile",
+    "fe:dev": "yarn contracts:compile && lerna exec --scope frontend -- yarn dev",
+    "fe:build": "lerna exec --scope frontend -- yarn build"
+  }
+}

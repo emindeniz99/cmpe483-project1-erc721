@@ -83,6 +83,7 @@ contract ProductContract is ERC721 {
     function mint(string memory serial_number, string memory zipcode)
         public
         onlyContractOwner
+        returns (uint256)
     {
         // check the uniqueness of serial number
         require(
@@ -120,6 +121,7 @@ contract ProductContract is ERC721 {
                 callQueryVerified(stateContractAddress, msg.sender)
             )
         );
+        return newItemId;
     }
 
     // calls queryVerify function of state
@@ -214,11 +216,19 @@ contract ProductContract is ERC721 {
         return temp;
     }
 
-    function returnPrevOwnerAddressOfToken(uint256 tokenId) public view returns (address){
+    function returnPrevOwnerAddressOfToken(uint256 tokenId)
+        public
+        view
+        returns (address)
+    {
         return prev_owners[tokenId][prev_owners[tokenId].length - 1].add;
     }
 
-    function returnWaitingAddress(uint256 tokenId) public view returns (address){
-        return  waitingtransfers[tokenId];
+    function returnWaitingAddress(uint256 tokenId)
+        public
+        view
+        returns (address)
+    {
+        return waitingtransfers[tokenId];
     }
 }

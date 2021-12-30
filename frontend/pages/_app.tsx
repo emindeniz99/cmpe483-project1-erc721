@@ -10,28 +10,13 @@ function MyApp({ Component, pageProps }: AppProps) {
       path: "/",
     },
     {
-      title: "state/deploy",
+      title: "state contract",
       path: "/state/deploy",
     },
+
     {
-      title: "state/useexistingAddress",
-      path: "/state/useexistingAddress/0xcontractaddress",
-    },
-    {
-      title: "product/deploy",
+      title: "product contract",
       path: "/product/deploy",
-    },
-    {
-      title: "product/useexistingAddress",
-      path: "/product/useexistingAddress/0xcontractaddress",
-    },
-    {
-      title: "/product/0xNFTAddress",
-      path: "/product/0xNFTAddress",
-    },
-    {
-      title: "product/useexistingAddress/0xcontractaddress/tokenID",
-      path: "/product/useexistingAddress/0xcontractaddress/tokenID",
     },
   ];
   return (

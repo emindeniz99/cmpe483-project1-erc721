@@ -1,0 +1,4 @@
+{
+  "packages": ["frontend", "truffle"],
+  "version": "0.0.0"
+}
