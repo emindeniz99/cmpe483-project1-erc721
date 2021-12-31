@@ -10,7 +10,7 @@ import { Contract } from "web3-eth-contract";
 const Home: NextPage = () => {
   const router = useRouter();
 
-  const { contractAddress: _contractAddress } = router.query;
+  const _contractAddress = router.query.contractAddress as string;
 
   const { web3, selectedAccountAddress, productContract } = useWeb3();
 
