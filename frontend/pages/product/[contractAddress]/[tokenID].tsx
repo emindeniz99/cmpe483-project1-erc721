@@ -227,6 +227,7 @@ const Home: NextPage = () => {
                     .approveTransfer(tokenID)
                     .send({ from: selectedAccountAddress });
                   setApproveTransfer(resultApproveTransfer);
+                  await refreshTrace();
                 } else {
                   alert(
                     "You are not the address where this token waits to be approved"
