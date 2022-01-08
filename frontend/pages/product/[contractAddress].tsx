@@ -74,6 +74,31 @@ const Home: NextPage = () => {
           <div>
             lastTokenID:
             {lastTokenID}
+            <br />
+            {[...new Array(lastTokenID)].map((_, index) => {
+              const tokenid = index + 1;
+              return (
+                <div
+                  key={tokenid}
+                  onClick={() => {
+                    router.push(
+                      `/product/${productContract.options.address}/${tokenid}`
+                    );
+                  }}
+                  style={{
+                    borderRadius: "50px",
+                    height: "100px",
+                    width: "100px",
+                    backgroundColor: "yellow",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    display: "flex",
+                  }}
+                >
+                  <span> {tokenid}</span>
+                </div>
+              );
+            })}
           </div>
         )}
 
