@@ -19,7 +19,9 @@ const Home: NextPage = () => {
   const [to, setToAdress] = useState("");
   const [tokenIdTransfer, setTokenIdTransfer] = useState("");
   const [tokenTransfer, setTokenTransfer] = useState("");
-  const [tokenTrace, setTokenTrace] = useState("");
+  const [tokenTrace, setTokenTrace] = useState<[string, boolean][] | null>(
+    null
+  );
   const [tokenIdApproveTransfer, setTokenIdApproveTransfer] = useState("");
   const [approveTransfer, setApproveTransfer] = useState("");
   const [tokenIdCancelTransfer, setTokenIdCancelTransfer] = useState("");
@@ -38,11 +40,7 @@ const Home: NextPage = () => {
             .manufacturer()
             .call({ from: selectedAccountAddress })
         );
-        const resultTrace = await productContract.methods
-          .trace(tokenID)
-          .call({ from: selectedAccountAddress });
-        setTokenTrace(resultTrace);
-
+        await refreshTrace();
         setWaiting(
           await productContract.methods
             .waitingtransfers(tokenID)
@@ -57,6 +55,13 @@ const Home: NextPage = () => {
       }
     })();
   }, [web3, selectedAccountAddress, _contractAddress, tokenID]);
+
+  const refreshTrace = async () => {
+    const resultTrace = await productContract.methods
+      .trace(tokenID)
+      .call({ from: selectedAccountAddress });
+    setTokenTrace(resultTrace);
+  };
   return (
     <div className={styles.container}>
       <Head>
@@ -81,7 +86,70 @@ const Home: NextPage = () => {
         <div>waiting : {waitingTransfer}</div>
         <div>prevOwnerOfToken : {prevOwnersOfToken}</div>
         <div>
-          trace a token: <pre>{JSON.stringify(tokenTrace, null, 2)}</pre>
+          trace a token:
+          {/* <pre>{JSON.stringify(tokenTrace, null, 2)}</pre> */}
+          <table
+            style={{
+              border: "1px solid black",
+            }}
+          >
+            <thead>
+              <th
+                style={{
+                  border: "1px solid black",
+                }}
+                onClick={async () => {
+                  setTokenTrace(null);
+                  await refreshTrace();
+                }}
+              >
+                🔄
+              </th>
+              <th
+                style={{
+                  border: "1px solid black",
+                }}
+              >
+                Address
+              </th>
+              <th
+                style={{
+                  border: "1px solid black",
+                }}
+              >
+                isVerified
+              </th>
+            </thead>
+            <tbody>
+              {tokenTrace?.map(([address, isVerified], index) => {
+                return (
+                  <tr key={index + address}>
+                    <td
+                      style={{
+                        border: "1px solid black",
+                      }}
+                    >
+                      {index + 1}
+                    </td>
+                    <td
+                      style={{
+                        border: "1px solid black",
+                      }}
+                    >
+                      {address}
+                    </td>
+                    <td
+                      style={{
+                        border: "1px solid black",
+                      }}
+                    >
+                      {isVerified ? "✔️" : "❌"}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
         {prevOwnersOfToken.toLowerCase() ==
           selectedAccountAddress.toLowerCase() &&
