@@ -70,96 +70,108 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         <h1>Product Contract - Token Page</h1>
-        <div>tokenid: {tokenID}</div>
+        <div>Token ID: {tokenID}</div>
         {contractAddress && (
-          <div>
+          <div
+            onClick={async () => {
+              router.push(`/product/${contractAddress}`);
+            }}
+          >
             Deployed Address:
             {contractAddress}
           </div>
         )}
         {contractOwner && (
           <div>
-            contractOwner:
+            Contract Owner:
             {contractOwner}
           </div>
         )}
-        <div>waiting : {waitingTransfer}</div>
-        <div>prevOwnerOfToken : {prevOwnersOfToken}</div>
+        <div>Prospective Owner : {waitingTransfer}</div>
+        <div> Owner Of Token : {prevOwnersOfToken}</div>
         <div>
-          trace a token:
+          <h2>Previous Owners</h2>
           {/* <pre>{JSON.stringify(tokenTrace, null, 2)}</pre> */}
-          <table
+          <div
             style={{
-              border: "1px solid black",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <thead>
-              <th
-                style={{
-                  border: "1px solid black",
-                }}
-                onClick={async () => {
-                  setTokenTrace(null);
-                  await refreshTrace();
-                }}
-              >
-                🔄
-              </th>
-              <th
-                style={{
-                  border: "1px solid black",
-                }}
-              >
-                Address
-              </th>
-              <th
-                style={{
-                  border: "1px solid black",
-                }}
-              >
-                isVerified
-              </th>
-            </thead>
-            <tbody>
-              {tokenTrace?.map(([address, isVerified], index) => {
-                return (
-                  <tr key={index + address}>
-                    <td
-                      style={{
-                        border: "1px solid black",
-                      }}
-                    >
-                      {index + 1}
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid black",
-                      }}
-                    >
-                      {address}
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid black",
-                      }}
-                    >
-                      {isVerified ? "✔️" : "❌"}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+            <table
+              style={{
+                border: "1px solid black",
+              }}
+            >
+              <thead>
+                <th
+                  style={{
+                    border: "1px solid black",
+                  }}
+                  onClick={async () => {
+                    setTokenTrace(null);
+                    await refreshTrace();
+                  }}
+                >
+                  🔄
+                </th>
+                <th
+                  style={{
+                    border: "1px solid black",
+                  }}
+                >
+                  Address
+                </th>
+                <th
+                  style={{
+                    border: "1px solid black",
+                  }}
+                >
+                  is verified?
+                </th>
+              </thead>
+              <tbody>
+                {tokenTrace?.map(([address, isVerified], index) => {
+                  return (
+                    <tr key={index + address}>
+                      <td
+                        style={{
+                          border: "1px solid black",
+                        }}
+                      >
+                        {index + 1}
+                      </td>
+                      <td
+                        style={{
+                          border: "1px solid black",
+                        }}
+                      >
+                        {address}
+                      </td>
+                      <td
+                        style={{
+                          border: "1px solid black",
+                        }}
+                      >
+                        {isVerified ? "✔️" : "❌"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>{" "}
+          </div>
         </div>
         {prevOwnersOfToken.toLowerCase() ==
           selectedAccountAddress.toLowerCase() &&
           waitingTransfer == "0x0000000000000000000000000000000000000000" && (
             <div>
-              transfer to:{" "}
               <input
                 type="text"
                 value={to}
                 onChange={(e) => setToAdress(e.target.value)}
+                placeholder="address"
               />
               {/* tokenId:{" "}
             <input
@@ -190,6 +202,8 @@ const Home: NextPage = () => {
                         .transfer(to, tokenID)
                         .send({ from: selectedAccountAddress });
                       setTokenTransfer(resultTransfer);
+                      alert("transfer started");
+                      window.location.reload();
                     } else {
                       alert(
                         "You are not the owner of this token so you can't send this token to someone else"
@@ -202,21 +216,15 @@ const Home: NextPage = () => {
                   }
                 }}
               >
-                call
+                transfer to
               </button>
-              <pre>{JSON.stringify(tokenTransfer, null, 2)}</pre>
+              {/* <pre>{JSON.stringify(tokenTransfer, null, 2)}</pre> */}
             </div>
           )}
 
         {selectedAccountAddress.toLowerCase() ==
           waitingTransfer.toLowerCase() && (
           <div>
-            Approve transfer :{" "}
-            {/* <input
-  type="text"
-  value={tokenIdApproveTransfer}
-  onChange={(e) => setTokenIdApproveTransfer(e.target.value)}
-/> */}
             <button
               onClick={async () => {
                 const a = await productContract.methods
@@ -228,6 +236,8 @@ const Home: NextPage = () => {
                     .send({ from: selectedAccountAddress });
                   setApproveTransfer(resultApproveTransfer);
                   await refreshTrace();
+                  alert("transfer is approved");
+                  window.location.reload();
                 } else {
                   alert(
                     "You are not the address where this token waits to be approved"
@@ -235,9 +245,9 @@ const Home: NextPage = () => {
                 }
               }}
             >
-              call
+              Approve transfer
             </button>
-            <pre>{JSON.stringify(approveTransfer, null, 2)}</pre>
+            {/* <pre>{JSON.stringify(approveTransfer, null, 2)}</pre> */}
           </div>
         )}
 
@@ -245,7 +255,6 @@ const Home: NextPage = () => {
           selectedAccountAddress.toLowerCase() &&
           waitingTransfer != "0x0000000000000000000000000000000000000000" && (
             <div>
-              Cancel transfer :{" "}
               <button
                 onClick={async () => {
                   const b = await productContract.methods
@@ -264,7 +273,8 @@ const Home: NextPage = () => {
                         .cancelTransfer(tokenID)
                         .send({ from: selectedAccountAddress });
                       setCancelTransfer(resultCancel);
-                      alert(approveTransfer);
+                      alert("transfer is cancelled");
+                      window.location.reload();
                     } else {
                       alert(
                         "You are not the owner of this token so you can't cancel the transfer"
@@ -277,9 +287,9 @@ const Home: NextPage = () => {
                   }
                 }}
               >
-                call
+                Cancel transfer
               </button>
-              <pre>{JSON.stringify(resultCancelTransfer, null, 2)}</pre>
+              {/* <pre>{JSON.stringify(resultCancelTransfer, null, 2)}</pre> */}
             </div>
           )}
       </main>

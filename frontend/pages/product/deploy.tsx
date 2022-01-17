@@ -25,7 +25,7 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         <div>
-          state add:{" "}
+          State address:{" "}
           <input
             type="text"
             value={stateaddress}
@@ -52,6 +52,7 @@ const Home: NextPage = () => {
           </div>
         )}
         <button
+          disabled={!stateaddress}
           onClick={async () => {
             console.log(
               await productContract
@@ -95,7 +96,7 @@ const GoToContract = () => {
 
   return (
     <div>
-      go to deployed contract:{" "}
+      Go to deployed contract:{" "}
       <input
         type="text"
         value={contractAddress}
@@ -103,6 +104,7 @@ const GoToContract = () => {
         placeholder="contract address"
       />
       <button
+        disabled={!contractAddress}
         onClick={async () => {
           router.push(`/product/${contractAddress}`);
         }}

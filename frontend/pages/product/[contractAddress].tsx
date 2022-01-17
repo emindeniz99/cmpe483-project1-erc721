@@ -60,45 +60,58 @@ const Home: NextPage = () => {
         )}
         {contractOwner && (
           <div>
-            contractOwner:
+            Contract Owner:
             {contractOwner}
           </div>
         )}
         {stateAddress && (
           <div>
-            stateAddress:
+            State Address:
             {stateAddress}
           </div>
         )}
-        {lastTokenID && (
+
+        {lastTokenID != 0 && (
           <div>
-            lastTokenID:
+            Total number of tokens stored in this contract:
             {lastTokenID}
+          </div>
+        )}
+        {lastTokenID != 0 && (
+          <div>
             <br />
-            {[...new Array(lastTokenID)].map((_, index) => {
-              const tokenid = index + 1;
-              return (
-                <div
-                  key={tokenid}
-                  onClick={() => {
-                    router.push(
-                      `/product/${productContract.options.address}/${tokenid}`
-                    );
-                  }}
-                  style={{
-                    borderRadius: "50px",
-                    height: "100px",
-                    width: "100px",
-                    backgroundColor: "yellow",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    display: "flex",
-                  }}
-                >
-                  <span> {tokenid}</span>
-                </div>
-              );
-            })}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {[...new Array(lastTokenID)].map((_, index) => {
+                const tokenid = index + 1;
+                return (
+                  <div
+                    key={tokenid}
+                    onClick={() => {
+                      router.push(
+                        `/product/${productContract.options.address}/${tokenid}`
+                      );
+                    }}
+                    style={{
+                      borderRadius: "50px",
+                      height: "100px",
+                      width: "100px",
+                      backgroundColor: "yellow",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      display: "flex",
+                    }}
+                  >
+                    <span> {tokenid}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -130,7 +143,7 @@ const TokenInput = ({
 
   return (
     <div>
-      go to token:{" "}
+      Go to token:{" "}
       <input
         type="text"
         value={tokenID}
@@ -165,7 +178,7 @@ const TokenInputBySerialNumber = ({
 
   return (
     <div>
-      go to TokenInputBySerialNumber:{" "}
+      Go to token by serial number:{" "}
       <input
         type="text"
         value={serialnumber}
@@ -209,7 +222,7 @@ const MintToken = ({ productContract }: { productContract: Contract }) => {
 
   return (
     <div>
-      mint:{" "}
+      Mint:{" "}
       <input
         type="text"
         value={serialNumber}
@@ -232,27 +245,49 @@ const MintToken = ({ productContract }: { productContract: Contract }) => {
           setmintedTokens(
             mintedTokens.concat({ tokenID, serialNumber, zipCode })
           );
+          alert("minted");
         }}
       >
         mint
       </button>
       <div>
-        {mintedTokens.map((token) => {
-          return (
-            <div
-              key={token.tokenID}
-              onClick={() => {
-                router.push(
-                  `/product/${productContract.options.address}/${token.tokenID}`
+        <h2>Recently Minted Tokens </h2>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <table>
+            <thead>
+              <th>Serial Number</th>
+              <th>Zip Code</th>
+              <th>Token ID</th>
+            </thead>
+            <tbody>
+              {mintedTokens.map((token) => {
+                return (
+                  <tr
+                    style={{
+                      backgroundColor: "turquoise",
+                    }}
+                    key={token.tokenID}
+                    onClick={() => {
+                      router.push(
+                        `/product/${productContract.options.address}/${token.tokenID}`
+                      );
+                    }}
+                  >
+                    <td> {token.serialNumber}</td>
+                    <td> {token.zipCode}</td>
+                    <td> {token.tokenID}</td>
+                  </tr>
                 );
-              }}
-            >
-              <span> {token.serialNumber}</span>
-              <span> {token.zipCode}</span>
-              <span> {token.tokenID}</span>
-            </div>
-          );
-        })}
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

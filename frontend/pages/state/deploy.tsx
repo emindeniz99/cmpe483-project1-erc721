@@ -78,7 +78,7 @@ const GoToContract = () => {
 
   return (
     <div>
-      go to deployed contract:{" "}
+      Go to deployed contract:{" "}
       <input
         type="text"
         value={contractAddress}
@@ -86,6 +86,7 @@ const GoToContract = () => {
         placeholder="contract address"
       />
       <button
+        disabled={!contractAddress}
         onClick={async () => {
           router.push(`/state/${contractAddress}`);
         }}

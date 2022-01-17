@@ -20,6 +20,8 @@
   "scripts": {
     "contracts:compile": "lerna exec --scope contracts -- yarn truffle compile",
     "fe:dev": "yarn contracts:compile && lerna exec --scope frontend -- yarn dev",
-    "fe:build": "lerna exec --scope frontend -- yarn build"
+    "fe:build": "lerna exec --scope frontend -- yarn build",
+    "fe": "yarn fe:dev",
+    "c": "yarn contracts:compile"
   }
 }

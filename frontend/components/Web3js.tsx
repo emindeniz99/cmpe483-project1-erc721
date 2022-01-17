@@ -117,7 +117,7 @@ const Web3js: React.FC<Props> = (props) => {
         value={{ web3, selectedAccountAddress, stateContract, productContract }}
       >
         <div style={{ margin: "2rem", backgroundColor: "yellow" }}>
-          selectedAccountAddress:{selectedAccountAddress}
+          Selected Account Address: {selectedAccountAddress}
         </div>
         {props.children}
       </Web3jsContext.Provider>

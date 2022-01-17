@@ -50,36 +50,38 @@ const Home: NextPage = () => {
         )}
         {contractOwner && (
           <div>
-            contractOwner:
+            Contract Owner:
             {contractOwner}
           </div>
         )}
         <div>
-          queryVerified:{" "}
           <input
             type="text"
             value={queryVerifiedAddress}
             onChange={(e) => setqueryVerifiedAddress(e.target.value)}
+            placeholder="address"
           />
           <button
             onClick={async () => {
               alert(
-                await stateContract.methods
+                (await stateContract.methods
                   .queryVerified(queryVerifiedAddress)
-                  .call({ from: selectedAccountAddress })
+                  .call({ from: selectedAccountAddress }))
+                  ? "Verified"
+                  : "Not verified"
               );
             }}
           >
-            call
+            query
           </button>
         </div>
 
         <div>
-          verify:{" "}
           <input
             type="text"
             value={verifiedAddress}
             onChange={(e) => setverifiedAddress(e.target.value)}
+            placeholder="address"
           />
           <button
             onClick={async () => {
@@ -87,18 +89,27 @@ const Home: NextPage = () => {
                 contractOwner.toLowerCase() ===
                 selectedAccountAddress.toLowerCase()
               ) {
-                const result = await stateContract.methods
-                  .verify(verifiedAddress)
-                  .send({ from: selectedAccountAddress });
-                setverifiedResult(result);
+                if (
+                  !(await stateContract.methods
+                    .queryVerified(verifiedAddress)
+                    .call({ from: selectedAccountAddress }))
+                ) {
+                  const result = await stateContract.methods
+                    .verify(verifiedAddress)
+                    .send({ from: selectedAccountAddress });
+                  setverifiedResult(result);
+                  alert("verified");
+                } else {
+                  alert("this account is already verified");
+                }
               } else {
                 alert("you are not the owner of the state contract");
               }
             }}
           >
-            call
+            verify
           </button>
-          <pre>{JSON.stringify(verifiedResult, null, 2)}</pre>
+          {/* <pre>{JSON.stringify(verifiedResult, null, 2)}</pre> */}
         </div>
       </main>
 
