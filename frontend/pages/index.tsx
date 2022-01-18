@@ -31,7 +31,7 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         {/* <div>networkId: {networkId}</div> */}
-        <div>Balance: {balance / 10 ** 18} eth </div>
+        <div>Balance: {balance / 10 ** 18} </div>
       </main>
 
       <footer className={styles.footer}></footer>
