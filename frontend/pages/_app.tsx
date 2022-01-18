@@ -10,12 +10,12 @@ function MyApp({ Component, pageProps }: AppProps) {
       path: "/",
     },
     {
-      title: "state contract",
+      title: "State contract",
       path: "/state/deploy",
     },
 
     {
-      title: "product contract",
+      title: "Product contract",
       path: "/product/deploy",
     },
   ];
